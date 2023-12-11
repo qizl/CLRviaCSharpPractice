@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34302.85
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CLRviaCSharpPractice.Tests", "CLRviaCSharpPractice.Tests\CLRviaCSharpPractice.Tests.csproj", "{14E982E8-43DF-4CB4-8F6A-B0C196D8A372}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CLRviaCSharpPractice", "CLRviaCSharpPractice\CLRviaCSharpPractice.csproj", "{93538178-3181-4C1A-A8D5-FF5CF1F60B5B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{14E982E8-43DF-4CB4-8F6A-B0C196D8A372}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14E982E8-43DF-4CB4-8F6A-B0C196D8A372}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14E982E8-43DF-4CB4-8F6A-B0C196D8A372}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14E982E8-43DF-4CB4-8F6A-B0C196D8A372}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93538178-3181-4C1A-A8D5-FF5CF1F60B5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93538178-3181-4C1A-A8D5-FF5CF1F60B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93538178-3181-4C1A-A8D5-FF5CF1F60B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93538178-3181-4C1A-A8D5-FF5CF1F60B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {90F239BE-BB32-45A0-9AA6-77F689236A70}
+	EndGlobalSection
+EndGlobal
