@@ -2,7 +2,7 @@
 {
     internal class BackgroundThread
     {
-        public static void Test()
+        public static void Run()
         {
             var isBackground = false;
             Console.WriteLine($"isBackground：{isBackground}");

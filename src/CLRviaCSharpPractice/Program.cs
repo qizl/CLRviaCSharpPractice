@@ -1,3 +1,5 @@
 ﻿using CLRviaCSharpPractice.Chapter26;
 
-BackgroundThread.Test();
+FirstThread.Run();
+
+//BackgroundThread.Run();
