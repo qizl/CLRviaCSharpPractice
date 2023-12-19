@@ -12,6 +12,7 @@
             Thread.Sleep(1000);     // Simulating other work (10 seconds)
 
             dedicatedThread.Join();  // Wait for thread to terminate
+            Console.WriteLine("Hit <Enter> to end this program...");
             Console.ReadLine();
         }
 

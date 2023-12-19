@@ -1,5 +1,11 @@
 ﻿using CLRviaCSharpPractice.Chapter26;
+using CLRviaCSharpPractice.Chapter27;
 
-FirstThread.Run();
+// Chapter27
+//ThreadPoolDemo.Run();
+ExecutionContexts.Run();
+
+// Chapter26
+//FirstThread.Run();
 
 //BackgroundThread.Run();
