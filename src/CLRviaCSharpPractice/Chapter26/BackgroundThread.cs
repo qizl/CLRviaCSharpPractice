@@ -29,5 +29,16 @@
             }
             Console.WriteLine("ThreadMethod Exited!");
         }
+
+        public static void RunTask()
+        {
+            Console.WriteLine("ThreadMethod Start.");
+
+            //Task.Factory.StartNew(threadMethod);
+
+            Task.Run(threadMethod);
+
+            Console.WriteLine("Main Thread Exit.");
+        }
     }
 }
