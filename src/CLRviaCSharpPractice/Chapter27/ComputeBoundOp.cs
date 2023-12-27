@@ -220,14 +220,14 @@ namespace CLRviaCSharpPractice.Chapter27
 
             unobservedException();
 
-            //SynchronizationContextTaskScheduler();
+            //synchronizationContextTaskScheduler();
         }
 
         private static void usingTaskInsteadOfQueueUserWorkItem()
         {
-            ThreadPool.QueueUserWorkItem(computeBoundOp, 5);
-            new Task(computeBoundOp, 5).Start();
-            Task.Run(() => computeBoundOp(5));
+            ThreadPool.QueueUserWorkItem(ComputeBoundOp, 5); // 调用 QueueUserWorkItem
+            new Task(ComputeBoundOp, 5).Start(); // 用 Task 来做相同的事情
+            Task.Run(() => ComputeBoundOp(5)); // 另一个等价的写法
         }
 
         private static void waitForResult()
@@ -306,12 +306,9 @@ namespace CLRviaCSharpPractice.Chapter27
             Task<Int32> t = Task.Run(() => sum(10000));
 
             // Each ContinueWith returns a Task but you usually don't care
-            t.ContinueWith(task => Console.WriteLine("The sum is: " + task.Result),
-               TaskContinuationOptions.OnlyOnRanToCompletion);
-            t.ContinueWith(task => Console.WriteLine("Sum threw: " + task.Exception),
-               TaskContinuationOptions.OnlyOnFaulted);
-            t.ContinueWith(task => Console.WriteLine("Sum was canceled"),
-               TaskContinuationOptions.OnlyOnCanceled);
+            t.ContinueWith(task => Console.WriteLine("The sum is: " + task.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+            t.ContinueWith(task => Console.WriteLine("Sum threw: " + task.Exception), TaskContinuationOptions.OnlyOnFaulted);
+            t.ContinueWith(task => Console.WriteLine("Sum was canceled"), TaskContinuationOptions.OnlyOnCanceled);
 
             try
             {
@@ -362,7 +359,7 @@ namespace CLRviaCSharpPractice.Chapter27
                     tf.StartNew(() => sum(cts.Token, 10000)),
                     tf.StartNew(() => sum(cts.Token, 20000)),
                     tf.StartNew(() => sum(cts.Token, Int32.MaxValue))  // Too big, throws OverflowException
-                 };
+                };
 
                 // If any of the child tasks throw, cancel the rest of them
                 for (Int32 task = 0; task < childTasks.Length; task++)
@@ -371,11 +368,11 @@ namespace CLRviaCSharpPractice.Chapter27
                 // When all children are done, get the maximum value returned from the non-faulting/canceled tasks
                 // Then pass the maximum value to another task which displays the maximum result
                 tf.ContinueWhenAll(
-                   childTasks,
-                   completedTasks => completedTasks.Where(t => t.Status == TaskStatus.RanToCompletion).Max(t => t.Result),
-                   CancellationToken.None)
-                   .ContinueWith(t => Console.WriteLine("The maximum is: " + t.Result),
-                      TaskContinuationOptions.ExecuteSynchronously).Wait(); // Wait is for testing only
+                    childTasks,
+                    completedTasks => completedTasks.Where(t => t.Status == TaskStatus.RanToCompletion).Max(t => t.Result),
+                    CancellationToken.None)
+                    .ContinueWith(t => Console.WriteLine("The maximum is: " + t.Result),
+                        TaskContinuationOptions.ExecuteSynchronously).Wait(); // Wait is for testing only
             });
 
             // When the children are done, show any unhandled exceptions too
@@ -428,7 +425,7 @@ namespace CLRviaCSharpPractice.Chapter27
             Console.ReadLine();
         }
 
-        private static void SynchronizationContextTaskScheduler()
+        private static void synchronizationContextTaskScheduler()
         {
             //var f = new MyForm();
             //System.Windows.Forms.Application.Run();
@@ -438,50 +435,52 @@ namespace CLRviaCSharpPractice.Chapter27
 
 
         //private sealed class MyForm : System.Windows.Forms.Form
-        //{
-        //    private readonly TaskScheduler m_syncContextTaskScheduler;
-        //    public MyForm()
-        //    {
-        //        // Get a reference to a synchronization context task scheduler
-        //        m_syncContextTaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+        private sealed class MyForm
+        {
+            private readonly TaskScheduler m_syncContextTaskScheduler;
+            public MyForm()
+            {
+                // Get a reference to a synchronization context task scheduler
+                m_syncContextTaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
-        //        Text = "Synchronization Context Task Scheduler Demo";
-        //        Visible = true; Width = 400; Height = 100;
-        //    }
+                Text = "Synchronization Context Task Scheduler Demo";
+                Visible = true; Width = 400; Height = 100;
+            }
 
-        //    private CancellationTokenSource m_cts;
+            private CancellationTokenSource m_cts;
 
-        //    protected override void OnMouseClick(System.Windows.Forms.MouseEventArgs e)
-        //    {
-        //        if (m_cts != null)
-        //        {    // An operation is in flight, cancel it
-        //            m_cts.Cancel();
-        //            m_cts = null;
-        //        }
-        //        else
-        //        {                // An operation is not in flight, start it
-        //            Text = "Operation running";
-        //            m_cts = new CancellationTokenSource();
+            //protected override void OnMouseClick(System.Windows.Forms.MouseEventArgs e)
+            protected override void OnMouseClick()
+            {
+                if (m_cts != null)
+                {    // An operation is in flight, cancel it
+                    m_cts.Cancel();
+                    m_cts = null;
+                }
+                else
+                {                // An operation is not in flight, start it
+                    Text = "Operation running";
+                    m_cts = new CancellationTokenSource();
 
-        //            // This task uses the default task scheduler and executes on a thread pool thread
-        //            Task<Int32> t = Task.Run(() => Sum(m_cts.Token, 20000), m_cts.Token);
+                    // This task uses the default task scheduler and executes on a thread pool thread
+                    Task<Int32> t = Task.Run(() => Sum(m_cts.Token, 20000), m_cts.Token);
 
-        //            // These tasks use the synchronization context task scheduler and execute on the GUI thread
-        //            t.ContinueWith(task => Text = "Result: " + task.Result,
-        //               CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion,
-        //               m_syncContextTaskScheduler);
+                    // These tasks use the synchronization context task scheduler and execute on the GUI thread
+                    t.ContinueWith(task => Text = "Result: " + task.Result,
+                        CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion,
+                        m_syncContextTaskScheduler);
 
-        //            t.ContinueWith(task => Text = "Operation canceled",
-        //               CancellationToken.None, TaskContinuationOptions.OnlyOnCanceled,
-        //               m_syncContextTaskScheduler);
+                    t.ContinueWith(task => Text = "Operation canceled",
+                        CancellationToken.None, TaskContinuationOptions.OnlyOnCanceled,
+                        m_syncContextTaskScheduler);
 
-        //            t.ContinueWith(task => Text = "Operation faulted",
-        //               CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted,
-        //               m_syncContextTaskScheduler);
-        //        }
-        //        base.OnMouseClick(e);
-        //    }
-        //}
+                    t.ContinueWith(task => Text = "Operation faulted",
+                        CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted,
+                        m_syncContextTaskScheduler);
+                }
+                //base.OnMouseClick(e);
+            }
+        }
 
         private sealed class ThreadPerTaskScheduler : TaskScheduler
         {
@@ -495,5 +494,83 @@ namespace CLRviaCSharpPractice.Chapter27
                 return TryExecuteTask(task);
             }
         }
+    }
+
+    internal static class ParallelDemo
+    {
+        public static void Run()
+        {
+            SimpleUsage();
+
+            String path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            Console.WriteLine("The total bytes of all files in {0} is {1:N0}.", path, DirectoryBytes(@path, "*.*", SearchOption.TopDirectoryOnly));
+        }
+
+        private static void SimpleUsage()
+        {
+            // One thread performs all this work sequentially
+            for (Int32 i = 0; i < 1000; i++) DoWork(i);
+
+            // The thread pool’s threads process the work in parallel
+            Parallel.For(0, 1000, i => DoWork(i));
+
+            var collection = new Int32[0];
+            // One thread performs all this work sequentially
+            foreach (var item in collection) DoWork(item);
+
+            // The thread pool’s threads process the work in parallel
+            Parallel.ForEach(collection, item => DoWork(item));
+
+            // One thread executes all the methods sequentially
+            Method1();
+            Method2();
+            Method3();
+
+            // The thread pool’s threads execute the methods in parallel
+            Parallel.Invoke(
+                () => Method1(),
+                () => Method2(),
+                () => Method3());
+        }
+
+        private static Int64 DirectoryBytes(String path, String searchPattern, SearchOption searchOption)
+        {
+            var files = Directory.EnumerateFiles(path, searchPattern, searchOption);
+            Int64 masterTotal = 0;
+
+            ParallelLoopResult result = Parallel.ForEach<String, Int64>(files,
+               () =>
+               { // localInit: Invoked once per task at start
+                 // Initialize that this task has seen 0 bytes
+                   return 0;   // Set's taskLocalTotal to 0
+               },
+
+               (file, parallelLoopState, index, taskLocalTotal) =>
+               { // body: Invoked once per work item
+                 // Get this file's size and add it to this task's running total
+                   Int64 fileLength = 0;
+                   FileStream fs = null;
+                   try
+                   {
+                       fs = File.OpenRead(file);
+                       fileLength = fs.Length;
+                   }
+                   catch (IOException) { /* Ignore any files we can't access */ }
+                   finally { if (fs != null) fs.Dispose(); }
+                   return taskLocalTotal + fileLength;
+               },
+
+               taskLocalTotal =>
+               { // localFinally: Invoked once per task at end
+                 // Atomically add this task's total to the "master" total
+                   Interlocked.Add(ref masterTotal, taskLocalTotal);
+               });
+            return masterTotal;
+        }
+
+        private static void DoWork(Int32 i) { }
+        private static void Method1() { }
+        private static void Method2() { }
+        private static void Method3() { }
     }
 }

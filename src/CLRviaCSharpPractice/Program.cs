@@ -10,9 +10,11 @@ using CLRviaCSharpPractice.Chapter27;
 
 //TaskDemo.Run();
 
+ParallelDemo.Run();
+
 // Chapter26
 //FirstThread.Run();
 
 //BackgroundThread.Run();
 
-BackgroundThread.RunTask();
+//BackgroundThread.RunTask();
