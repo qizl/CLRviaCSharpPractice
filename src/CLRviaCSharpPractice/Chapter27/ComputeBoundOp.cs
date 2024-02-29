@@ -225,9 +225,9 @@ namespace CLRviaCSharpPractice.Chapter27
 
         private static void usingTaskInsteadOfQueueUserWorkItem()
         {
-            ThreadPool.QueueUserWorkItem(ComputeBoundOp, 5); // 调用 QueueUserWorkItem
-            new Task(ComputeBoundOp, 5).Start(); // 用 Task 来做相同的事情
-            Task.Run(() => ComputeBoundOp(5)); // 另一个等价的写法
+            //ThreadPool.QueueUserWorkItem(ComputeBoundOp, 5); // 调用 QueueUserWorkItem
+            //new Task(ComputeBoundOp, 5).Start(); // 用 Task 来做相同的事情
+            //Task.Run(() => ComputeBoundOp(5)); // 另一个等价的写法
         }
 
         private static void waitForResult()
@@ -434,53 +434,53 @@ namespace CLRviaCSharpPractice.Chapter27
         private static void computeBoundOp(Object state) { }
 
 
-        //private sealed class MyForm : System.Windows.Forms.Form
-        private sealed class MyForm
-        {
-            private readonly TaskScheduler m_syncContextTaskScheduler;
-            public MyForm()
-            {
-                // Get a reference to a synchronization context task scheduler
-                m_syncContextTaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+        ////private sealed class MyForm : System.Windows.Forms.Form
+        //private sealed class MyForm
+        //{
+        //    private readonly TaskScheduler m_syncContextTaskScheduler;
+        //    public MyForm()
+        //    {
+        //        // Get a reference to a synchronization context task scheduler
+        //        m_syncContextTaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
-                Text = "Synchronization Context Task Scheduler Demo";
-                Visible = true; Width = 400; Height = 100;
-            }
+        //        Text = "Synchronization Context Task Scheduler Demo";
+        //        Visible = true; Width = 400; Height = 100;
+        //    }
 
-            private CancellationTokenSource m_cts;
+        //    private CancellationTokenSource m_cts;
 
-            //protected override void OnMouseClick(System.Windows.Forms.MouseEventArgs e)
-            protected override void OnMouseClick()
-            {
-                if (m_cts != null)
-                {    // An operation is in flight, cancel it
-                    m_cts.Cancel();
-                    m_cts = null;
-                }
-                else
-                {                // An operation is not in flight, start it
-                    Text = "Operation running";
-                    m_cts = new CancellationTokenSource();
+        //    //protected override void OnMouseClick(System.Windows.Forms.MouseEventArgs e)
+        //    protected override void OnMouseClick()
+        //    {
+        //        if (m_cts != null)
+        //        {    // An operation is in flight, cancel it
+        //            m_cts.Cancel();
+        //            m_cts = null;
+        //        }
+        //        else
+        //        {                // An operation is not in flight, start it
+        //            Text = "Operation running";
+        //            m_cts = new CancellationTokenSource();
 
-                    // This task uses the default task scheduler and executes on a thread pool thread
-                    Task<Int32> t = Task.Run(() => Sum(m_cts.Token, 20000), m_cts.Token);
+        //            // This task uses the default task scheduler and executes on a thread pool thread
+        //            Task<Int32> t = Task.Run(() => Sum(m_cts.Token, 20000), m_cts.Token);
 
-                    // These tasks use the synchronization context task scheduler and execute on the GUI thread
-                    t.ContinueWith(task => Text = "Result: " + task.Result,
-                        CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion,
-                        m_syncContextTaskScheduler);
+        //            // These tasks use the synchronization context task scheduler and execute on the GUI thread
+        //            t.ContinueWith(task => Text = "Result: " + task.Result,
+        //                CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion,
+        //                m_syncContextTaskScheduler);
 
-                    t.ContinueWith(task => Text = "Operation canceled",
-                        CancellationToken.None, TaskContinuationOptions.OnlyOnCanceled,
-                        m_syncContextTaskScheduler);
+        //            t.ContinueWith(task => Text = "Operation canceled",
+        //                CancellationToken.None, TaskContinuationOptions.OnlyOnCanceled,
+        //                m_syncContextTaskScheduler);
 
-                    t.ContinueWith(task => Text = "Operation faulted",
-                        CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted,
-                        m_syncContextTaskScheduler);
-                }
-                //base.OnMouseClick(e);
-            }
-        }
+        //            t.ContinueWith(task => Text = "Operation faulted",
+        //                CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted,
+        //                m_syncContextTaskScheduler);
+        //        }
+        //        //base.OnMouseClick(e);
+        //    }
+        //}
 
         private sealed class ThreadPerTaskScheduler : TaskScheduler
         {
